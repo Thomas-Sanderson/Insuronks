@@ -1,0 +1,240 @@
+﻿{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "PDS: Verify Tooling",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$portableGit = 'C:\\Users\\thomas.sanderson\\Appz\\git\\PortableGit\\cmd\\git.exe'; $tools = 'python','lazygit','codex','wt'; foreach ($t in $tools) { if (Get-Command $t -ErrorAction SilentlyContinue) { Write-Host \"[ok] $t\" } else { Write-Host \"[missing] $t\" } }; if (Test-Path $portableGit) { Write-Host '[ok] portable-git' } else { Write-Host '[missing] portable-git' }"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "PDS: Smoke CLI (--help)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$env:PYTHONPATH='src'; if (Test-Path .venv\\Scripts\\python.exe) { .venv\\Scripts\\python.exe -m aca_sbc.cli --help } else { python -m aca_sbc.cli --help }"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PDS: Run GUI",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$env:PYTHONPATH='src'; if (Test-Path .venv\\Scripts\\python.exe) { .venv\\Scripts\\python.exe -m aca_sbc.gui } else { python -m aca_sbc.gui }"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PDS: Extract Plan Benefits CSV",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$env:PYTHONPATH='src'; if (Test-Path .venv\\Scripts\\python.exe) { .venv\\Scripts\\python.exe -m aca_sbc.cli --csv \"VIOP CS Tracker(ACA SBCs).csv\" --out \"out.csv\" } else { python -m aca_sbc.cli --csv \"VIOP CS Tracker(ACA SBCs).csv\" --out \"out.csv\" }"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PDS: Baseline Extract (Checkpointed)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$env:PYTHONPATH='src'; if (Test-Path .venv\\Scripts\\python.exe) { .venv\\Scripts\\python.exe -m aca_sbc.cli --csv \"VIOP CS Tracker(ACA SBCs).csv\" --out \"out\\plan_benefits_baseline.csv\" --checkpoint-every 250 } else { python -m aca_sbc.cli --csv \"VIOP CS Tracker(ACA SBCs).csv\" --out \"out\\plan_benefits_baseline.csv\" --checkpoint-every 250 }"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PDS: Resume Extract (Checkpointed)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$env:PYTHONPATH='src'; if (Test-Path .venv\\Scripts\\python.exe) { .venv\\Scripts\\python.exe -m aca_sbc.cli --csv \"VIOP CS Tracker(ACA SBCs).csv\" --out \"out\\plan_benefits_baseline.csv\" --checkpoint-every 250 --resume } else { python -m aca_sbc.cli --csv \"VIOP CS Tracker(ACA SBCs).csv\" --out \"out\\plan_benefits_baseline.csv\" --checkpoint-every 250 --resume }"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PDS: Report Parse Quality",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$env:PYTHONPATH='src'; if (Test-Path .venv\\Scripts\\python.exe) { .venv\\Scripts\\python.exe scripts\\report_parse_quality.py --input \"out\\plan_benefits_baseline.csv\" --json-out \"out\\plan_benefits_baseline.metrics.json\" } else { python scripts\\report_parse_quality.py --input \"out\\plan_benefits_baseline.csv\" --json-out \"out\\plan_benefits_baseline.metrics.json\" }"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PDS: Lazygit",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "if (Get-Command lazygit -ErrorAction SilentlyContinue) { lazygit } else { Write-Error 'lazygit not found in PATH' }"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PDS: Git Preflight",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$git='C:\\Users\\thomas.sanderson\\Appz\\git\\PortableGit\\cmd\\git.exe'; if (-not (Test-Path $git)) { Write-Error 'Portable git not found'; exit 1 }; if (-not (Test-Path .git)) { Write-Error 'Not a git repository at workspace root'; exit 1 }; & $git status --short; & $git branch --show-current"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PDS: Create Worktree",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$git='C:\\Users\\thomas.sanderson\\Appz\\git\\PortableGit\\cmd\\git.exe'; if (-not (Test-Path $git)) { Write-Error 'Portable git not found'; exit 1 }; if (-not (Test-Path .git)) { Write-Error 'Not a git repository at workspace root'; exit 1 }; $name='${input:worktreeName}'; $branch='${input:branchName}'; New-Item -ItemType Directory -Path .worktrees -Force | Out-Null; & $git worktree add .worktrees/$name -b $branch"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PDS: Orchestrate (Parallel)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\scripts\\pds-orchestrate.ps1",
+        "-Task",
+        "${input:orchestratorTask}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PDS: Orchestrate (Terminal Tabs)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\scripts\\pds-orchestrate.ps1",
+        "-Task",
+        "${input:orchestratorTask}",
+        "-OpenWindowsTerminal"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PDS: Parse Swarm (Deterministic Rules)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\scripts\\pds-parse-swarm.ps1",
+        "-Problem",
+        "${input:parseSwarmProblem}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "worktreeName",
+      "type": "promptString",
+      "description": "Worktree folder name (under .worktrees/)"
+    },
+    {
+      "id": "branchName",
+      "type": "promptString",
+      "description": "New branch name (example: feat/parser-fix)"
+    },
+    {
+      "id": "orchestratorTask",
+      "type": "promptString",
+      "description": "Task brief for researcher/worker/reviewer"
+    },
+    {
+      "id": "parseSwarmProblem",
+      "type": "promptString",
+      "description": "Parsing reliability problem statement for swarm",
+      "default": "Improve deterministic extraction reliability for ACA SBC fields and reduce blank/error rates."
+    }
+  ]
+}

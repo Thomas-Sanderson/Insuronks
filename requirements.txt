@@ -1,0 +1,6 @@
+﻿requests==2.32.3
+tenacity==8.3.0
+pandas==2.2.3
+tqdm==4.66.4
+pdfplumber==0.11.4
+pymupdf==1.24.10
