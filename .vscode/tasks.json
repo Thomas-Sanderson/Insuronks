@@ -111,6 +111,70 @@
       "problemMatcher": []
     },
     {
+      "label": "PDS: Smoke Build Sample CSV",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$env:PYTHONPATH='src'; if (Test-Path .venv\\Scripts\\python.exe) { .venv\\Scripts\\python.exe scripts\\make_smoke_sample.py --input \"VIOP CS Tracker(ACA SBCs).csv\" --output \"out\\smoke_input.csv\" --rows ${input:smokeRows} --mode head } else { python scripts\\make_smoke_sample.py --input \"VIOP CS Tracker(ACA SBCs).csv\" --output \"out\\smoke_input.csv\" --rows ${input:smokeRows} --mode head }"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PDS: Smoke Extract Sample",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$env:PYTHONPATH='src'; if (Test-Path .venv\\Scripts\\python.exe) { .venv\\Scripts\\python.exe -m aca_sbc.cli --csv \"out\\smoke_input.csv\" --out \"out\\smoke_plan_benefits.csv\" --checkpoint-every 25 --include-source-meta } else { python -m aca_sbc.cli --csv \"out\\smoke_input.csv\" --out \"out\\smoke_plan_benefits.csv\" --checkpoint-every 25 --include-source-meta }"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PDS: Smoke Report Quality",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$env:PYTHONPATH='src'; if (Test-Path .venv\\Scripts\\python.exe) { .venv\\Scripts\\python.exe scripts\\report_parse_quality.py --input \"out\\smoke_plan_benefits.csv\" --json-out \"out\\smoke_plan_benefits.metrics.json\" } else { python scripts\\report_parse_quality.py --input \"out\\smoke_plan_benefits.csv\" --json-out \"out\\smoke_plan_benefits.metrics.json\" }"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PDS: Smoke Merge Into Plan Benefits Preview",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$env:PYTHONPATH='src'; if (Test-Path .venv\\Scripts\\python.exe) { .venv\\Scripts\\python.exe scripts\\merge_smoke_into_plan_benefits.py --base \"VIOP CS Tracker(Plan Benefits).csv\" --smoke \"out\\smoke_plan_benefits.csv\" --out \"out\\VIOP Plan Benefits.smoke-merged-preview.csv\" } else { python scripts\\merge_smoke_into_plan_benefits.py --base \"VIOP CS Tracker(Plan Benefits).csv\" --smoke \"out\\smoke_plan_benefits.csv\" --out \"out\\VIOP Plan Benefits.smoke-merged-preview.csv\" }"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "PDS: Lazygit",
       "type": "shell",
       "command": "powershell",
@@ -235,6 +299,12 @@
       "type": "promptString",
       "description": "Parsing reliability problem statement for swarm",
       "default": "Improve deterministic extraction reliability for ACA SBC fields and reduce blank/error rates."
+    },
+    {
+      "id": "smokeRows",
+      "type": "promptString",
+      "description": "Smoke sample row count (suggest 30)",
+      "default": "30"
     }
   ]
 }

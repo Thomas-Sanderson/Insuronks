@@ -18,6 +18,19 @@ KEY_FIELDS = [
 ]
 
 
+def _read_csv_robust(path: str) -> pd.DataFrame:
+    encodings = ["utf-8-sig", "utf-8", "cp1252", "latin-1"]
+    last_err: Exception | None = None
+    for enc in encodings:
+        try:
+            return pd.read_csv(path, encoding=enc)
+        except UnicodeDecodeError as exc:
+            last_err = exc
+    if last_err:
+        raise last_err
+    return pd.read_csv(path)
+
+
 def _blank_rate(series: pd.Series) -> float:
     text = series.fillna("").astype(str).str.strip()
     if len(text) == 0:
@@ -53,7 +66,7 @@ def main() -> int:
     args = parser.parse_args()
 
     path = Path(args.input)
-    df = pd.read_csv(path)
+    df = _read_csv_robust(str(path))
     report = build_report(df)
 
     print(f"rows={report['rows']}")

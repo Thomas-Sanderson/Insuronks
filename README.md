@@ -16,6 +16,7 @@ Deterministic extraction pipeline for ACA SBC PDFs, with a repeatable quality wo
 - `docs/README.md` : documentation index
 - `docs/specs/deterministic-parsing-aca-sbc.md` : reliability spec and thresholds
 - `docs/checklists/code-review-checklist.md` : review checklist
+- `docs/smoke-test-playbook.md` : controlled sub-agent + parser smoke run guide
 
 ## Automation / Agent Files
 - `AGENTS.md` : operating rules for code changes

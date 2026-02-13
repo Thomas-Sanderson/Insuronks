@@ -11,6 +11,19 @@ from .download import download_pdf
 from .parse import parse_pdf
 
 
+def _read_csv_robust(path: str) -> pd.DataFrame:
+    encodings = ["utf-8-sig", "utf-8", "cp1252", "latin-1"]
+    last_err: Exception | None = None
+    for enc in encodings:
+        try:
+            return pd.read_csv(path, encoding=enc)
+        except UnicodeDecodeError as exc:
+            last_err = exc
+    if last_err:
+        raise last_err
+    return pd.read_csv(path)
+
+
 def detect_url_column(df: pd.DataFrame) -> str:
     for candidate in [
         "URLForSummaryofBenefitsCoverage",
@@ -43,11 +56,14 @@ def _combine_payer_plan(row: pd.Series, payer_col: str | None, plan_col: str | N
 
 def _build_row(
     row: pd.Series,
+    source_idx: int,
+    url_value: str,
     state_col: str | None,
     payer_col: str | None,
     plan_col: str | None,
     parsed: Any = None,
     error: str | None = None,
+    include_source_meta: bool = False,
 ) -> dict[str, Any]:
     out = {
         "STATE": str(row[state_col]).strip() if state_col else "",
@@ -62,6 +78,9 @@ def _build_row(
         "OON COI": "",
         "OON COP": "",
     }
+    if include_source_meta:
+        out["SOURCE_ROW"] = source_idx
+        out["SOURCE_URL"] = url_value
     if parsed is not None:
         out.update(
             {
@@ -112,9 +131,14 @@ def main() -> int:
         action="store_true",
         help="Resume from existing output file row count",
     )
+    parser.add_argument(
+        "--include-source-meta",
+        action="store_true",
+        help="Include SOURCE_ROW and SOURCE_URL columns in output",
+    )
     args = parser.parse_args()
 
-    df = pd.read_csv(args.csv)
+    df = _read_csv_robust(args.csv)
     url_col = args.url_col or detect_url_column(df)
 
     state_col = _get_col(df, "StateCode", "STATE", "state")
@@ -135,9 +159,31 @@ def main() -> int:
         try:
             pdf_path = download_pdf(url)
             parsed = parse_pdf(str(pdf_path))
-            rows_buffer.append(_build_row(row, state_col, payer_col, plan_col, parsed=parsed))
+            rows_buffer.append(
+                _build_row(
+                    row,
+                    source_idx=idx,
+                    url_value=url,
+                    state_col=state_col,
+                    payer_col=payer_col,
+                    plan_col=plan_col,
+                    parsed=parsed,
+                    include_source_meta=args.include_source_meta,
+                )
+            )
         except Exception as exc:
-            rows_buffer.append(_build_row(row, state_col, payer_col, plan_col, error=str(exc)))
+            rows_buffer.append(
+                _build_row(
+                    row,
+                    source_idx=idx,
+                    url_value=url,
+                    state_col=state_col,
+                    payer_col=payer_col,
+                    plan_col=plan_col,
+                    error=str(exc),
+                    include_source_meta=args.include_source_meta,
+                )
+            )
 
         if len(rows_buffer) >= checkpoint_every:
             _append_rows(rows_buffer, out_path, write_header)

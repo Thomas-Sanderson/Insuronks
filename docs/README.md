@@ -2,6 +2,7 @@
 
 ## Product Docs
 - `specs/deterministic-parsing-aca-sbc.md` : deterministic parser requirements, thresholds, and run commands.
+- `smoke-test-playbook.md` : step-by-step small controlled smoke run.
 
 ## Process Docs
 - `checklists/code-review-checklist.md` : release/readiness review checklist.
