@@ -19,7 +19,7 @@ Work in small, reversible changes to improve ACA SBC extraction quality and spee
 ## Definition Of Done
 - Change addresses the stated user issue.
 - Relevant command(s) run without errors.
-- Review checklist in `docs/checklists/review.md` is satisfied.
+- Review checklist in `docs/checklists/code-review-checklist.md` is satisfied.
 
 ## Git Conventions
 - Branch naming: `feat/<topic>`, `fix/<topic>`, `chore/<topic>`.
@@ -30,3 +30,4 @@ Work in small, reversible changes to improve ACA SBC extraction quality and spee
 - Prioritize correctness, regressions, and data integrity.
 - Call out missing tests explicitly.
 - Include file references for important changes.
+
